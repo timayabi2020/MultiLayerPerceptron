@@ -11,6 +11,7 @@ import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.LMS;
 
+
 /**
  *
  * @author Tim Mayabi
@@ -18,7 +19,7 @@ import org.neuroph.nnet.learning.LMS;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Time stamp N1:" + new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:MM").format(new Date()));
+//        System.out.println("Time stamp N1:" + new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:MM").format(new Date()));
 
         int maxIterations = 10000;
         NeuralNetwork neuralNet = new MultiLayerPerceptron(4, 9, 1);
@@ -46,19 +47,22 @@ public class Main {
         trainingSet.addElement(new SupervisedTrainingElement(new double[]{4176.0D / daxmax, 4187.0D / daxmax, 4223.0D / daxmax, 4259.0D / daxmax}, new double[]{4203.0D / daxmax}));
         trainingSet.addElement(new SupervisedTrainingElement(new double[]{4187.0D / daxmax, 4223.0D / daxmax, 4259.0D / daxmax, 4203.0D / daxmax}, new double[]{3989.0D / daxmax}));
         neuralNet.learnInSameThread(trainingSet);
-        System.out.println("Time stamp N2:" + new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:MM").format(new Date()));
-        //System.out.println("Neural network learning rule ");
+//        System.out.println("Time stamp N2:" + new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:MM").format(new Date()));
+        System.out.println("Neural Total network Error " + ((LMS) neuralNet.getLearningRule()).getTotalNetworkError());
         TrainingSet testSet = new TrainingSet();
         testSet.addElement(new TrainingElement(new double[]{4223.0D / daxmax, 4259.0D / daxmax, 4203.0D / daxmax, 3989.0D / daxmax}));
+        testSet.addElement(new TrainingElement(new double[]{3996.0D / daxmax, 4043.0D / daxmax, 4068.0D / daxmax, 4176.0D / daxmax}));
 
         for (TrainingElement testElement : testSet.trainingElements()) {
             neuralNet.setInput(testElement.getInput());
             neuralNet.calculate();
             Vector<Double> networkOutput = neuralNet.getOutput();
             System.out.print("Input: " + testElement.getInput());
-            System.out.println(" Output: " + networkOutput);
+            System.out.print(" Output: " + networkOutput);
+            
+            
         }
-
+        
         //Experiments:
         //                   calculated
         //31;3;2009;4084,76 -> 4121 Error=0.01 Rate=0.7 Iterat=100
@@ -67,7 +71,7 @@ public class Main {
         //31;3;2009;4084,76 -> 4108 Error=0.01 Rate=0.7 Iterat=100000
         //31;3;2009;4084,76 -> 4084 Error=0.001 Rate=0.7 Iterat=10000
 
-        System.out.println("Time stamp N3:" + new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:MM").format(new Date()));
+        //System.out.println("Time stamp N3:" + new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:MM").format(new Date()));
         System.exit(0);
     }
 }
