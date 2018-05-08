@@ -31,7 +31,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 public class DAO {
         private int maxCounter;
     private String[] valuesRow;
-     private double normolizer = 100.0D;
+     private double normolizer = 100000.0D;
     private double minlevel = 0.0D;
     private TrainingSet trainingSet = new TrainingSet();
     public String[] getValuesRow() {

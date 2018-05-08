@@ -28,7 +28,7 @@ import org.neuroph.nnet.learning.LMS;
 public class Main {
     private int maxCounter;
     private String[] valuesRow;
-     private double normolizer = 100.0D;
+     private double normolizer = 100000.0D;
     private double minlevel = 0.0D;
     private TrainingSet trainingSet = new TrainingSet();
     public String[] getValuesRow() {
@@ -64,7 +64,7 @@ public class Main {
           dao.readNRBData();
 
         int maxIterations = 200000;
-        NeuralNetwork neuralNet = new MultiLayerPerceptron(4, 20,20, 1);
+        NeuralNetwork neuralNet = new MultiLayerPerceptron(4,10,10 ,1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(0.1);//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(0.5);//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
