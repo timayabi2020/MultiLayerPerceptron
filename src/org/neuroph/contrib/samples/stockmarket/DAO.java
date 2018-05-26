@@ -75,7 +75,7 @@ public class DAO {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,DATA FROM NAIROBI";
+            String query ="SELECT ID,DATA FROM NAIROBI ORDER BY 1 DESC";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
            
@@ -85,8 +85,12 @@ public class DAO {
                
                 values=result.getString("DATA");
                 id = String.valueOf(result.getInt("ID"));
-                hm.put(id, values);
-               counter = counter + 1;
+                //for(int a=0; a<31;a ++){
+                   hm.put(id, values);
+                  //counter = counter + 1;
+                
+                counter = counter + 1;
+               
             }
             
              connection.close();
@@ -127,6 +131,7 @@ public class DAO {
                 String s3 = valuesRow[j + 2];
                 String s4 = valuesRow[j + 3];
                 String s5 = valuesRow[j + 4];
+                System.out.println(s1);
                 double d1 = (Double.parseDouble(s1) - minlevel) / normolizer;
                // System.out.println("D1 "+d1 *normolizer + " S1 "+ s1);
                 double d2 = (Double.parseDouble(s2) - minlevel) / normolizer;
@@ -134,8 +139,9 @@ public class DAO {
                 double d4 = (Double.parseDouble(s4) - minlevel) / normolizer;
                 double d5 = (Double.parseDouble(s5) - minlevel) / normolizer;
                 //System.out.println(i + " " + d1 + " " + d2 + " " + d3 + " " + d4 + " ->" + d5);
+                //for(int k =0; k<6306; k++){
                 trainingSet.addElement(new SupervisedTrainingElement(new double[]{d1, d2, d3, d4}, new double[]{d5}));
-               
+                
             }
          return trainingSet;
     }

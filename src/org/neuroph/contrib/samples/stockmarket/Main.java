@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.nnet.learning.LMS;
+import org.neuroph.util.TransferFunctionType;
 
 
 /**
@@ -30,6 +32,7 @@ public class Main {
     private String[] valuesRow;
      private double normolizer = 100.0D;
     private double minlevel = 0.0D;
+    private static DecimalFormat df2 = new DecimalFormat(".######");
     private TrainingSet trainingSet = new TrainingSet();
     public String[] getValuesRow() {
         return valuesRow;
@@ -64,8 +67,8 @@ public class Main {
           dao.readNRBData();
 
         int maxIterations = 200000;
-        NeuralNetwork neuralNet = new MultiLayerPerceptron(4, 6,1, 1);
-        ((LMS) neuralNet.getLearningRule()).setMaxError(0.1);//0-1
+        NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4,19,19, 1);
+        ((LMS) neuralNet.getLearningRule()).setMaxError(0.001);//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(0.5);//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
         //TrainingSet trainingSet = new TrainingSet();
@@ -82,12 +85,15 @@ public class Main {
            //neuralNet.learnInSameThread(backPropagation);
           neuralNet.learnInSameThread(trainingSet, backPropagation);
           
-
-        System.out.println("Neural Total network Error " + ((LMS)neuralNet.getLearningRule()).getTotalNetworkError());
+           
+        System.out.println("Neural Total network Error " + df2.format(((LMS)neuralNet.getLearningRule()).getTotalNetworkError()));
         //System.out.println("Neural Total network Error " + neuralNet.getLearningRule());
-        
+        // save trained neural network
+          neuralNet.save("nrbPerceptron.nnet");
+          // load saved neural network
+         NeuralNetwork loadedMlPerceptron = NeuralNetwork.load("nrbPerceptron.nnet");
          HashMap hm = new HashMap();
-       Statement stmt = null; 
+         Statement stmt = null; 
         
         PreparedStatement preparedstatement = null;
         String values="";
@@ -148,7 +154,9 @@ public class Main {
          double rmse = 0.0;
          double sqrtrmse=0.0;
          double mape = 0.0;
+         double getsum  =0.0;
          TrainingSet testSet = new TrainingSet();
+        
          for (int j = 0; j + 4 < valuesRow.length; j++) {
                 String s1 = valuesRow[j];
                 String s2 = valuesRow[j + 1];
@@ -161,23 +169,25 @@ public class Main {
                 double d3 = (Double.parseDouble(s3) - minlevel) / normolizer;
                 double d4 = (Double.parseDouble(s4) - minlevel) / normolizer;
                 double d5 = (Double.parseDouble(s5) - minlevel) / normolizer;
-                System.out.print( "Actual"  + (d5*normolizer));
+                System.out.print( "Actual"  + df2.format((d5*normolizer)));
                  testSet.addElement(new TrainingElement(new double[]{d1}));
-                 neuralNet.setInput(d1,d2,d3,d4);
-                  neuralNet.calculate();
-                 System.out.print(" Predicted "+ (neuralNet.getOutput().firstElement())*normolizer);
-                  error = (d5*normolizer) - ((neuralNet.getOutput().firstElement())*normolizer);
-                 System.out.println(" Error "+ error);
-                
+                 loadedMlPerceptron.setInput(d1,d2,d3,d4);
+                  loadedMlPerceptron.calculate();
+                 System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
+                  error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d5*normolizer);
+                 System.out.println(" Error "+ df2.format(error));
+                 //getsum =+error;
+                 System.out.println("Adding RMSE "+getsum);
                  rmse =+ (error*error);
             }
-         
+              
+             System.out.println(" Total RMSE COUNT  "+ df2.format(rmse));
              sqrtrmse=sqrt((rmse/valuesRow.length));
-              System.out.println(" Total RMSE  "+ sqrtrmse);
+              System.out.println(" Total RMSE  "+ df2.format(sqrtrmse));
               
               mape = (rmse/valuesRow.length);
 
-              System.out.println(" MAD  "+ mape);
+              System.out.println(" MAD  "+ df2.format(mape));
        }
     
 
