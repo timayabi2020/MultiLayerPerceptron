@@ -93,10 +93,11 @@ public class DAO {
             result.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
             }
             int maxCount = (int)(70*rowcount); 
+            counter=maxCount/100;
            System.out.println("full number of values = " + counter + " Number of training data"+ maxCount/100); 
             setMaxCounter(maxCount/100);
-             for(int i =0; i<maxCount; i++){
-               while(result.next()){
+             for(int i =0; i<counter; i++){
+               if(result.next()){
                 riceprice=result.getString("RICEPRICE");
                 inflation=result.getString("INFLATION");
                 rainfall=result.getString("RAINFALL");

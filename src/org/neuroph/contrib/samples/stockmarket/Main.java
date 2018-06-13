@@ -1,4 +1,3 @@
-
 package org.neuroph.contrib.samples.stockmarket;
 
 import static java.lang.Math.sqrt;
@@ -114,7 +113,7 @@ public class Main {
          double sqrtrmse=0.0;
          double mape = 0.0;
          double rmse = 0.0;
-         double getsum  =0.0;
+         double mad  =0.0;
          List mapes = new ArrayList();
          int maxCount=0;
          TrainingSet testSet = new TrainingSet();
@@ -139,8 +138,8 @@ public class Main {
            System.out.println("full number of values = " + counter + " Number of training data "+ maxCount/100); 
             setMaxCounter(maxCount/100);
             counter = maxCount/100;
-            for(int i =0; i<maxCount; i++){
-                while(result.next()){
+            for(int i =0; i<counter; i++){
+                if(result.next()){
                 riceprice=result.getString("RICEPRICE");
                 inflation=result.getString("INFLATION");
                 rainfall=result.getString("RAINFALL");
@@ -166,7 +165,7 @@ public class Main {
                   error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d3*normolizer);
                  System.out.print(" Error "+ df2.format(error));
                  
-                 //getsum =+error;
+                 mad +=Math.abs(error);
                  
                  error = Double.parseDouble(df2.format(error));
                  double actual = Double.parseDouble(df2.format(d3*normolizer));
@@ -242,7 +241,7 @@ public class Main {
 //            }
               for(int i =0; i<rmses.size(); i++){
                   //System.out.println("RMSE VALUES "+ rmses.get(i));
-                rmse=+Float.parseFloat(rmses.get(i).toString()); 
+                rmse+=Float.parseFloat(rmses.get(i).toString()); 
               }
               for(int i =0; i<mapes.size(); i++){
                  
@@ -257,7 +256,8 @@ public class Main {
               mape = (mape/counter);
               //System.out.println("Count "+ counter);
 
-              System.out.println(" MAPE  "+ df2.format(mape));
+              System.out.println("Network  MAPE  "+ df2.format(mape));
+              System.out.println("Network  MAD  "+ df2.format(mad/counter));
        }
     
 
@@ -266,3 +266,5 @@ public class Main {
         this.setValuesRow(valuesRow);
     }
 }
+
+  
