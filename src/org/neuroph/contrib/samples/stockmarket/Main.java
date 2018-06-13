@@ -8,9 +8,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 import org.neuroph.core.NeuralNetwork;
@@ -66,8 +68,8 @@ public class Main {
           DAO dao = new DAO();
           dao.readNRBData();
 
-        int maxIterations = 10000;
-        NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,5,22,22, 1);
+        int maxIterations = 5000;
+        NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,5,8,8, 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(0.001);//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(0.5);//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -108,10 +110,12 @@ public class Main {
          int rowcount = 0;
         int counter = 0;
           double error = 0.0;
-         double rmse = 0.0;
+         List rmses = new ArrayList();
          double sqrtrmse=0.0;
          double mape = 0.0;
+         double rmse = 0.0;
          double getsum  =0.0;
+         List mapes = new ArrayList();
          int maxCount=0;
          TrainingSet testSet = new TrainingSet();
         try {
@@ -129,9 +133,12 @@ public class Main {
             rowcount = result.getRow();
             result.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
             }
+            System.out.println("*** ===== "+rowcount);
             maxCount = (int)(30*rowcount); 
-           System.out.println("full number of values = " + counter + " Number of training data"+ maxCount/100); 
+            System.out.println("Before "+ maxCount);
+           System.out.println("full number of values = " + counter + " Number of training data "+ maxCount/100); 
             setMaxCounter(maxCount/100);
+            counter = maxCount/100;
             for(int i =0; i<maxCount; i++){
                 while(result.next()){
                 riceprice=result.getString("RICEPRICE");
@@ -157,12 +164,17 @@ public class Main {
                   loadedMlPerceptron.calculate();
                  System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
                   error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d3*normolizer);
-                 System.out.println(" Error "+ df2.format(error));
+                 System.out.print(" Error "+ df2.format(error));
+                 
                  //getsum =+error;
-                 System.out.println("Adding RMSE "+getsum);
-                 rmse =+ (error*error);
-                      
-                      
+                 
+                 error = Double.parseDouble(df2.format(error));
+                 double actual = Double.parseDouble(df2.format(d3*normolizer));
+                 rmses.add((error*error));
+                 mapes.add(Math.abs(error/actual) *100);
+                 System.out.println(" MAPE "+ Math.abs(error/actual) *100);
+                    
+                     
                 }
                
             }
@@ -228,14 +240,24 @@ public class Main {
 //                 System.out.println("Adding RMSE "+getsum);
 //                 rmse =+ (error*error);
 //            }
-              
-             System.out.println(" Total RMSE COUNT  "+ df2.format(rmse));
-             sqrtrmse=sqrt((rmse/maxCount));
+              for(int i =0; i<rmses.size(); i++){
+                  //System.out.println("RMSE VALUES "+ rmses.get(i));
+                rmse=+Float.parseFloat(rmses.get(i).toString()); 
+              }
+              for(int i =0; i<mapes.size(); i++){
+                 
+                mape+=Double.parseDouble(mapes.get(i).toString()); 
+                
+              }
+              //System.out.println("MAPE SUM "+ mape); 
+            // System.out.println(" Total RMSE COUNT  "+ df2.format(rmse));
+             sqrtrmse=sqrt((rmse/counter));
               System.out.println(" Total RMSE  "+ df2.format(sqrtrmse));
               
-              mape = (rmse/maxCount);
+              mape = (mape/counter);
+              //System.out.println("Count "+ counter);
 
-              System.out.println(" MAD  "+ df2.format(mape));
+              System.out.println(" MAPE  "+ df2.format(mape));
        }
     
 
